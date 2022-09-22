@@ -2,6 +2,7 @@ package com.ratz.productservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ratz.productservice.dto.ProductRequestDTO;
+import com.ratz.productservice.dto.ProductResponseDTO;
 import com.ratz.productservice.repository.ProductRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -62,7 +65,11 @@ class ProductServiceApplicationTests {
                 .andExpect(status().isOk()).andReturn();
 
         String response = result.getResponse().getContentAsString();
-        Assertions.assertTrue(response.contains("iPhone 13"));
+        List<ProductResponseDTO> obj = Arrays.asList(objectMapper.readValue(response, ProductResponseDTO[].class));
+
+        Assertions.assertEquals("iPhone 13", obj.get(0).getName());
+        Assertions.assertEquals(1, obj.size());
+
     }
 
     private ProductRequestDTO getProductRequest() {
