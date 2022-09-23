@@ -1,6 +1,10 @@
 package com.ratz.inventoryservice.service;
 
+import com.ratz.inventoryservice.dto.InventoryResponseDTO;
+
+import java.util.List;
+
 public interface InventoryService {
 
-    boolean isInStock(String skuCode);
+    List<InventoryResponseDTO> isInStock(List<String> skuCode);
 }
