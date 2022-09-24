@@ -24,7 +24,7 @@ public class OrderServiceImpl implements OrderService {
 
 
     private final OrderRepository orderRepository;
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     @Override
     public void placeOrder(OrderRequestDTO orderRequestDTO) {
@@ -39,9 +39,9 @@ public class OrderServiceImpl implements OrderService {
         List<String> skuCodes = order.getOrderLineItems().stream().map(OrderLineItems::getSkuCode).toList();
 
         //Call inventory service and place order if products in stock
-        InventoryResponseDTO[] result = webClient
+        InventoryResponseDTO[] result = webClientBuilder.build()
                 .get()
-                .uri("http://localhost:8082/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
+                .uri("http://inventory-service/api/inventory", uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
                 .retrieve()
                 .bodyToMono(InventoryResponseDTO[].class)
                 .block();
