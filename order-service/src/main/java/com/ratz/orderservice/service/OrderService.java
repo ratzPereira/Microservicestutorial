@@ -4,5 +4,5 @@ import com.ratz.orderservice.dto.OrderRequestDTO;
 
 public interface OrderService {
 
-    void placeOrder(OrderRequestDTO orderRequestDTO);
+    String placeOrder(OrderRequestDTO orderRequestDTO);
 }
