@@ -3,12 +3,14 @@ package com.ratz.orderservice.service.impl;
 import com.ratz.orderservice.dto.InventoryResponseDTO;
 import com.ratz.orderservice.dto.OrderLineItemsDTO;
 import com.ratz.orderservice.dto.OrderRequestDTO;
+import com.ratz.orderservice.event.OrderPlacedEvent;
 import com.ratz.orderservice.model.Order;
 import com.ratz.orderservice.model.OrderLineItems;
 import com.ratz.orderservice.repository.OrderRepository;
 import com.ratz.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,6 +27,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final WebClient.Builder webClientBuilder;
+    private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     @Override
     public String placeOrder(OrderRequestDTO orderRequestDTO) {
@@ -51,8 +54,12 @@ public class OrderServiceImpl implements OrderService {
         if (Boolean.TRUE.equals(allProductsInStock)) {
 
             orderRepository.save(order);
+
+            kafkaTemplate.send("notificationTopic" , new OrderPlacedEvent(order.getOrderNumber()));
             return "Order placed!";
+
         } else {
+
             throw new IllegalArgumentException("Product not in stock");
         }
 
